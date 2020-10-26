@@ -43,6 +43,12 @@ function Get-PAOrder {
                     $_.PSObject.Properties.Remove('DnsPlugin')
                 }
 
+                # de-obfuscate PfxPassB64U
+                if ('PfxPassB64U' -in $_.PSObject.Properties.Name) {
+                    $_ | Add-Member 'PfxPass' ($_.PfxPassB64U | ConvertFrom-Base64Url)
+                    $_.PSObject.Properties.Remove('PfxPassB64U')
+                }
+
                 # insert the type name and send the results to the pipeline
                 $_.PSObject.TypeNames.Insert(0,'PoshACME.PAOrder')
                 Write-Output $_
@@ -74,6 +80,12 @@ function Get-PAOrder {
                     if ('DnsPlugin' -in $order.PSObject.Properties.Name) {
                         $order | Add-Member -MemberType NoteProperty -Name 'Plugin' -Value $order.DnsPlugin
                         $order.PSObject.Properties.Remove('DnsPlugin')
+                    }
+
+                    # de-obfuscate PfxPassB64U
+                    if ('PfxPassB64U' -in $order.PSObject.Properties.Name) {
+                        $order | Add-Member 'PfxPass' ($order.PfxPassB64U | ConvertFrom-Base64Url)
+                        $order.PSObject.Properties.Remove('PfxPassB64U')
                     }
 
                 } else {
